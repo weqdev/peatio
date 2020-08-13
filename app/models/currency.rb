@@ -139,12 +139,6 @@ class Currency < ApplicationRecord
     self.base_factor = 10 ** n
   end
 
-  def as_json(*)
-    { code: code,
-      coin: coin?,
-      fiat: fiat? }
-  end
-
   def to_blockchain_api_settings
     # We pass options are available as top-level hash keys and via options for
     # compatibility with Wallet#to_wallet_api_settings.
@@ -152,17 +146,6 @@ class Currency < ApplicationRecord
     opt.deep_symbolize_keys.merge(id:          id,
                                   base_factor: base_factor,
                                   options:     opt)
-  end
-
-  def summary
-    locked  = Account.with_currency(code).sum(:locked)
-    balance = Account.with_currency(code).sum(:balance)
-    { name:     id.upcase,
-      sum:      locked + balance,
-      balance:  balance,
-      locked:   locked,
-      coinable: coin?,
-      hot:      coin? ? balance : nil }
   end
 
   def is_erc20?
@@ -179,29 +162,16 @@ class Currency < ApplicationRecord
     end
   end
 
-  def initialize_options
-    self.options = options.present? ? options : {}
-  end
-
-  def validate_options
-    errors.add(:options, :invalid) unless Hash === options if options.present?
-  end
-
-  def build_options_schema
-    default_schema = DEFAULT_OPTIONS_SCHEMA
-    props_schema = (options.keys - OPTIONS_ATTRIBUTES.map(&:to_s)) \
-                       .map{|v| [v, { title: v.to_s.humanize, format: "table"}]}.to_h
-    default_schema.merge!(props_schema)
-  end
-
-  def set_options_values
-    options.keys.present?  ? \
-          options.keys.map{|v| [v, options[v]]}.to_h \
-          : OPTIONS_ATTRIBUTES.map(&:to_s).map{|v| [v, '']}.to_h
-  end
-
   def subunits
     Math.log(self.base_factor, 10).round
+  end
+
+  def initialize_options	
+    self.options = options.present? ? options : {}	
+  end
+
+  def validate_options	
+    errors.add(:options, :invalid) unless Hash === options if options.present?	
   end
 end
 
