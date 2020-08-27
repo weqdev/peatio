@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_26_091118) do
+ActiveRecord::Schema.define(version: 2020_08_27_105929) do
 
   create_table "accounts", id: :integer, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.integer "member_id", null: false
@@ -407,8 +407,8 @@ ActiveRecord::Schema.define(version: 2020_08_26_091118) do
     t.string "currency_id", limit: 20, default: "any", null: false
     t.string "group", limit: 32, default: "any", null: false
     t.string "kyc_level", limit: 32, default: "any", null: false
-    t.decimal "l24hour", precision: 32, scale: 16, default: "0.0", null: false
-    t.decimal "l1month", precision: 32, scale: 16, default: "0.0", null: false
+    t.decimal "limit_24_hour", precision: 32, scale: 16, default: "0.0", null: false
+    t.decimal "limit_1_month", precision: 32, scale: 16, default: "0.0", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["currency_id", "group", "kyc_level"], name: "index_withdraw_limits_on_currency_id_and_group_and_kyc_level", unique: true

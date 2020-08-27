@@ -212,7 +212,7 @@ class Deposit < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20200806143442
+# Schema version: 20200827105929
 #
 # Table name: deposits
 #
@@ -228,6 +228,7 @@ end
 #  aasm_state     :string(30)       not null
 #  block_number   :integer
 #  type           :string(30)       not null
+#  transfer_type  :integer
 #  tid            :string(64)       not null
 #  spread         :string(1000)
 #  created_at     :datetime         not null
