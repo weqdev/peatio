@@ -112,7 +112,12 @@ module API
         get '/currencies' do
           admin_authorize! :read, Currency
 
-          search = Currency.ransack(type_eq: params[:type])
+          # If param type is not given variable types will be nil, and ransack will return full collection
+          if params[:type].present?
+            types = params[:type] == 'fiat'  ? params[:type] : Currency::CRYPTO_TYPES
+          end
+
+          search = Currency.ransack(type_in: types)
           search.sorts = "#{params[:order_by]} #{params[:ordering]}"
 
           present paginate(search.result), with: API::V2::Admin::Entities::Currency
@@ -153,7 +158,7 @@ module API
                    type: { value: Integer, message: 'admin.currency.non_integer_subunits' },
                    values: { value: (0..18), message: 'admin.currency.invalid_subunits' },
                    desc: -> { API::V2::Admin::Entities::Currency.documentation[:subunits][:desc] }
-          given type: ->(val) { val == 'coin' } do
+          given type: ->(val) { val == 'coin' || val == 'token' } do
             requires :blockchain_key,
                      values: { value: -> { ::Blockchain.pluck(:key) }, message: 'admin.currency.blockchain_key_doesnt_exist' },
                      desc: -> { API::V2::Admin::Entities::Currency.documentation[:blockchain_key][:desc] }

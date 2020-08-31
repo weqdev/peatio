@@ -87,7 +87,7 @@ module API
 
             if !currency.withdrawal_enabled?
               error!({ errors: ['account.currency.withdrawal_disabled'] }, 422)
-            elsif currency.coin? && declared_params.dig(:data, :address).blank?
+            elsif currency.crypto? && declared_params.dig(:data, :address).blank?
               error!({ errors: ['account.beneficiary.missing_address_in_data'] }, 422)
             elsif currency.fiat? && declared_params.dig(:data, :full_name).blank?
               error!({ errors: ['account.beneficiary.missing_full_name_in_data'] }, 422)
@@ -95,7 +95,7 @@ module API
 
             # Since data is stored in MySQL JSON format we iterate through all
             # beneficiaries one by one to detect duplicated address.
-            if currency.coin? &&
+            if currency.crypto? &&
                 current_user
                   .beneficiaries
                   .available_to_member

@@ -174,7 +174,7 @@ class Withdraw < ApplicationRecord
   def audit!
     with_lock do
       accept!
-      process! if quick? && currency.coin?
+      process! if quick? && currency.crypto?
     end
   end
 
@@ -205,7 +205,7 @@ class Withdraw < ApplicationRecord
       blockchain_txid: txid }
   end
 
-private
+  private
 
   # @deprecated
   def lock_funds

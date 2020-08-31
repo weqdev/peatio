@@ -119,7 +119,7 @@ module API
           )
 
           declared_params.merge!(beneficiary: beneficiary) if params[:beneficiary_id].present?
-          withdraw = "withdraws/#{currency.type}".camelize.constantize.new(declared_params)
+          withdraw = "withdraws/#{currency.account_type}".camelize.constantize.new(declared_params)
 
           withdraw.save!
           withdraw.with_lock { withdraw.submit! }

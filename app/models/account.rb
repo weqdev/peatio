@@ -32,7 +32,7 @@ class Account < ApplicationRecord
 
   # Returns active deposit address for account or creates new if any exists.
   def payment_address
-    return unless currency.coin?
+    return unless currency.crypto?
     pa = payment_addresses.last
 
     if pa.blank?
@@ -46,7 +46,7 @@ class Account < ApplicationRecord
 
   # Attempts to create additional deposit address for account.
   def payment_address!
-    return unless currency.coin?
+    return unless currency.crypto?
 
     record = payment_address
 

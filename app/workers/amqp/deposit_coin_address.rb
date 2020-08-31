@@ -9,7 +9,7 @@ module Workers
 
         acc = Account.find_by_id(payload[:account_id])
         return unless acc
-        return unless acc.currency.coin?
+        return unless acc.currency.crypto?
 
         wallet = Wallet.active.deposit.find_by(currency_id: acc.currency_id)
         unless wallet

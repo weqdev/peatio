@@ -66,7 +66,8 @@ FactoryBot.define do
       code                 { 'trst' }
       name                 { 'WeTrust' }
       symbol               { 'Ξ' }
-      type                 { 'coin' }
+      parent_id            { 'eth' }
+      type                 { 'token' }
       base_factor          { 1_000_000 }
       withdraw_limit_24h   { 100 }
       withdraw_limit_72h   { 1000 }
@@ -84,7 +85,8 @@ FactoryBot.define do
       code                 { 'ring' }
       name                 { 'Evolution Land Global Token' }
       symbol               { 'Ξ' }
-      type                 { 'coin' }
+      parent_id            { 'eth' }
+      type                 { 'token' }
       base_factor          { 1_000_000 }
       withdraw_limit_24h   { 100 }
       withdraw_limit_72h   { 1000 }

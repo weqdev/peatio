@@ -30,7 +30,7 @@ FactoryBot.define do
 
     data do
       # Use save navigation operator for cases when currency is nil.
-      if currency&.coin?
+      if currency&.crypto?
         generate(:coin_beneficiary_data).to_json
       elsif currency&.fiat?
         generate(:fiat_beneficiary_data).merge(currency: currency.id).to_json

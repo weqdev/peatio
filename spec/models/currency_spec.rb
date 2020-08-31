@@ -28,6 +28,23 @@ describe Currency do
     end
   end
 
+  context 'token' do
+    let!(:currency) { Currency.find(:ring) }
+    let!(:fiat_currency) { Currency.find(:eur) }
+
+    it 'validate parent_id presence' do
+      currency.parent_id = nil
+      expect(currency.valid?).to be_falsey
+      expect(currency.errors[:parent_id]).to match_array(["can't be blank", "is not included in the list"])
+    end
+
+    it 'validate parent_id value' do
+      currency.parent_id = fiat_currency.name
+      expect(currency.valid?).to be_falsey
+      expect(currency.errors[:parent_id]).to eq ["is not included in the list"]
+    end
+  end
+
   context 'scopes' do
     let(:currency) { Currency.find(:btc) }
 
@@ -106,6 +123,26 @@ describe Currency do
     it 'return currency subunits' do
       expect(fake_currency.subunits).to eq(2)
     end
+  end
+
+  context 'crypto?' do
+    let!(:coin_currency) { Currency.find(:btc) }
+    let!(:token_currency) { Currency.find(:trst) }
+    let!(:fiat_currency) { Currency.find(:eur) }
+
+    it { expect(coin_currency.crypto?).to eq true }
+    it { expect(token_currency.crypto?).to eq true }
+    it { expect(fiat_currency.crypto?).to eq false }
+  end
+
+  context 'account_type' do
+    let!(:coin_currency) { Currency.find(:btc) }
+    let!(:token_currency) { Currency.find(:trst) }
+    let!(:fiat_currency) { Currency.find(:eur) }
+
+    it { expect(coin_currency.account_type).to eq coin_currency.type }
+    it { expect(token_currency.account_type).to eq coin_currency.type }
+    it { expect(fiat_currency.account_type).to eq fiat_currency.type }
   end
 
   context 'validate max currency' do

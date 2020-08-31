@@ -28,7 +28,7 @@ module API
           use :pagination
           optional :type,
                    type: String,
-                   values: { value: %w[fiat coin], message: 'public.currency.invalid_type' },
+                   values: { value: ::Currency.types.map(&:to_s), message: 'public.currency.invalid_type' },
                    desc: -> { API::V2::Entities::Currency.documentation[:type][:desc] }
           optional :search, type: JSON, default: {} do
             optional :code,
@@ -47,7 +47,7 @@ module API
 
           present paginate(Rails.cache.fetch("currencies_#{params}", expires_in: 600) do
             currencies = Currency.visible.ordered
-            currencies = currencies.where(type: params[:type]).includes(:blockchain) if params[:type] == 'coin'
+            currencies = currencies.where(type: Currency::CRYPTO_TYPES).includes(:blockchain) if params[:type].in? Currency::CRYPTO_TYPES.map(&:to_s)
             currencies = currencies.where(type: params[:type]) if params[:type] == 'fiat'
 
             search = currencies.ransack(search_attrs)

@@ -146,6 +146,14 @@ class Deposit < ApplicationRecord
     self.member = Member.find_by_uid(uid)
   end
 
+  def fiat?
+    Deposits::Fiat === self
+  end
+
+  def coin?
+    !fiat?
+  end
+
   def as_json_for_event_api
     { tid:                      tid,
       user:                     { uid: member.uid, email: member.email },

@@ -246,6 +246,18 @@ describe API::V2::Account::Beneficiaries, 'POST', type: :request do
           expect(response.status).to eq 422
           expect(response).to include_api_error('account.beneficiary.missing_address_in_data')
         end
+
+        context "token" do
+          it do
+            beneficiary_data[:data].delete(:address)
+            beneficiary_data[:data][:currency] = :trst
+            beneficiary_data[:data][:memo] = :memo
+
+            api_post endpoint, params: beneficiary_data, token: token
+            expect(response.status).to eq 422
+            expect(response).to include_api_error('account.beneficiary.missing_address_in_data')
+          end
+        end
       end
 
       context 'disabled withdrawal for currency' do
@@ -284,6 +296,21 @@ describe API::V2::Account::Beneficiaries, 'POST', type: :request do
             api_post endpoint, params: beneficiary_data, token: token
             expect(response.status).to eq 422
             expect(response).to include_api_error('account.beneficiary.duplicate_address')
+          end
+
+          context 'token' do
+            before do
+              create(:beneficiary,
+                     member: member,
+                     currency_id: :trst,
+                     data: {address: beneficiary_data.dig(:data, :address)})
+            end
+
+            it do
+              api_post endpoint, params: beneficiary_data.merge(currency: :trst), token: token
+              expect(response.status).to eq 422
+              expect(response).to include_api_error('account.beneficiary.duplicate_address')
+            end
           end
         end
 

@@ -20,28 +20,28 @@ FactoryBot.define do
   factory :asset, class: Operations::Asset, parent: :operation do
     code do
       Operations::Account.find_by(type: :asset,
-                                 currency_type: currency.type).code
+                                 currency_type: currency.account_type).code
     end
   end
 
   factory :expense, class: Operations::Expense, parent: :operation do
     code do
       Operations::Account.find_by(type: :expense,
-                                  currency_type: currency.type).code
+                                  currency_type: currency.account_type).code
     end
   end
 
   factory :revenue, class: Operations::Revenue, parent: :operation do
     code do
       Operations::Account.find_by(type: :revenue,
-                                  currency_type: currency.type).code
+                                  currency_type: currency.account_type).code
     end
   end
 
   factory :liability, class: Operations::Liability, parent: :operation do
     code do
       Operations::Account.find_by(type: :liability,
-                                 currency_type: currency.type,
+                                 currency_type: currency.account_type,
                                  kind: :main).code
     end
     trait :with_member do

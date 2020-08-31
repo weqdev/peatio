@@ -91,7 +91,7 @@ module API
             error!({ errors: ['account.currency.withdrawal_disabled'] }, 422)
           end
 
-          withdraw = "withdraws/#{currency.type}".camelize.constantize.new \
+          withdraw = "withdraws/#{currency.account_type}".camelize.constantize.new \
             beneficiary: beneficiary,
             sum:         params[:amount],
             member:      current_user,

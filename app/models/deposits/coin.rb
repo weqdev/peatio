@@ -5,7 +5,7 @@ module Deposits
   class Coin < Deposit
     include HasOneBlockchainThroughCurrency
 
-    validate { errors.add(:currency, :invalid) if currency && !currency.coin? }
+    validate { errors.add(:currency, :invalid) if currency && !currency.crypto? }
     validates :address, :txid, presence: true
     validates :txid, uniqueness: { scope: %i[currency_id txout] }
 

@@ -196,7 +196,7 @@ describe API::V2::Management::Operations, type: :request do
         let(:signers) { %i[alex jeff] }
         let(:data) do
           { currency: currency.code,
-            code:     Operations::Account.find_by(type: op_type, currency_type: currency.type).code}
+            code:     Operations::Account.find_by(type: op_type, currency_type: currency.account_type).code}
         end
 
         context 'credit' do
@@ -213,7 +213,7 @@ describe API::V2::Management::Operations, type: :request do
             expect(JSON.parse(response.body)['code']).to \
               eq Operations::Account.find_by(type: op_type,
                                             kind: :main,
-                                            currency_type: currency.type).code
+                                            currency_type: currency.account_type).code
           end
 
           it 'saves operation' do
@@ -250,7 +250,7 @@ describe API::V2::Management::Operations, type: :request do
             expect(JSON.parse(response.body)['code']).to \
               eq Operations::Account.find_by(type: op_type,
                                             kind: :main,
-                                            currency_type: currency.type).code
+                                            currency_type: currency.account_type).code
           end
 
           it 'saves operation' do
@@ -271,7 +271,7 @@ describe API::V2::Management::Operations, type: :request do
         let(:member) { create(:member, :barong) }
         let(:data) do
           { currency: currency.code,
-            code:     Operations::Account.find_by(type: op_type, currency_type: currency.type, kind: :main).code,
+            code:     Operations::Account.find_by(type: op_type, currency_type: currency.account_type, kind: :main).code,
             uid:      member.uid }
         end
 
@@ -290,7 +290,7 @@ describe API::V2::Management::Operations, type: :request do
             expect(JSON.parse(response.body)['code']).to \
               eq Operations::Account.find_by(type: op_type,
                                             kind: :main,
-                                            currency_type: currency.type).code
+                                            currency_type: currency.account_type).code
           end
 
           it 'saves operation' do
@@ -335,7 +335,7 @@ describe API::V2::Management::Operations, type: :request do
             expect(JSON.parse(response.body)['code']).to \
               eq Operations::Account.find_by(type: op_type,
                                             kind: :main,
-                                            currency_type: currency.type).code
+                                            currency_type: currency.account_type).code
           end
 
           it 'saves operation' do

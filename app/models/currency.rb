@@ -12,6 +12,7 @@ class Currency < ApplicationRecord
     }
   }
   OPTIONS_ATTRIBUTES = %i[erc20_contract_address gas_limit gas_price].freeze
+  CRYPTO_TYPES = %i[token coin].freeze
 
   # == Attributes ===========================================================
 
@@ -31,6 +32,8 @@ class Currency < ApplicationRecord
 
   belongs_to :blockchain, foreign_key: :blockchain_key, primary_key: :key
 
+  has_one :parent, class_name: 'Currency', foreign_key: :id, primary_key: :parent_id
+
   # == Validations ==========================================================
 
   validate on: :create do
@@ -41,9 +44,13 @@ class Currency < ApplicationRecord
 
   validates :code, presence: true, uniqueness: { case_sensitive: false }
 
+  validates :parent_id, presence: true,
+            inclusion: { in: ->(_) { Currency.coins.pluck(:id).map(&:to_s)}},
+            if: :token?
+
   validates :blockchain_key,
             inclusion: { in: ->(_) { Blockchain.pluck(:key).map(&:to_s) } },
-            if: :coin?
+            if: :crypto?
 
   validates :type, inclusion: { in: ->(_) { Currency.types.map(&:to_s) } }
   validates :symbol, presence: true, length: { maximum: 1 }
@@ -69,7 +76,7 @@ class Currency < ApplicationRecord
   scope :deposit_enabled, -> { where(deposit_enabled: true) }
   scope :withdrawal_enabled, -> { where(withdrawal_enabled: true) }
   scope :ordered, -> { order(position: :asc) }
-  scope :coins,   -> { where(type: :coin) }
+  scope :coins,   -> { where(type: CRYPTO_TYPES) }
   scope :fiats,   -> { where(type: :fiat) }
 
   # == Callbacks ============================================================
@@ -105,7 +112,7 @@ class Currency < ApplicationRecord
     end
 
     def types
-      %i[fiat coin].freeze
+      %i[fiat coin token].freeze
     end
   end
 
@@ -139,9 +146,10 @@ class Currency < ApplicationRecord
   end
 
   def as_json(*)
-    { code: code,
-      coin: coin?,
-      fiat: fiat? }
+    { code:  code,
+      coin:  coin?,
+      fiat:  fiat?,
+      token: token? }
   end
 
   def to_blockchain_api_settings
@@ -153,6 +161,10 @@ class Currency < ApplicationRecord
                                   options:     opt)
   end
 
+  def account_type
+    crypto? ? 'coin' : 'fiat'
+  end
+
   def summary
     locked  = Account.with_currency(code).sum(:locked)
     balance = Account.with_currency(code).sum(:balance)
@@ -160,12 +172,16 @@ class Currency < ApplicationRecord
       sum:      locked + balance,
       balance:  balance,
       locked:   locked,
-      coinable: coin?,
-      hot:      coin? ? balance : nil }
+      coinable: crypto?,
+      hot:      crypto? ? balance : nil }
   end
 
   def is_erc20?
     erc20_contract_address.present?
+  end
+
+  def crypto?
+    coin? || token?
   end
 
   def dependent_markets
@@ -205,35 +221,40 @@ class Currency < ApplicationRecord
 end
 
 # == Schema Information
-# Schema version: 20200316132213
+# Schema version: 20200831095747
 #
 # Table name: currencies
 #
 #  id                    :string(10)       not null, primary key
 #  name                  :string(255)
+#  description           :text(65535)
+#  homepage              :string(255)
 #  blockchain_key        :string(32)
+#  parent_id             :string(255)
 #  symbol                :string(1)        not null
 #  type                  :string(30)       default("coin"), not null
-#  deposit_fee           :decimal(32, 16)  default("0.0000000000000000"), not null
-#  min_deposit_amount    :decimal(32, 16)  default("0.0000000000000000"), not null
-#  min_collection_amount :decimal(32, 16)  default("0.0000000000000000"), not null
-#  withdraw_fee          :decimal(32, 16)  default("0.0000000000000000"), not null
-#  min_withdraw_amount   :decimal(32, 16)  default("0.0000000000000000"), not null
-#  withdraw_limit_24h    :decimal(32, 16)  default("0.0000000000000000"), not null
-#  withdraw_limit_72h    :decimal(32, 16)  default("0.0000000000000000"), not null
-#  position              :integer          default("0"), not null
-#  options               :string(1000)     default("{}")
-#  visible               :boolean          default("1"), not null
-#  deposit_enabled       :boolean          default("1"), not null
-#  withdrawal_enabled    :boolean          default("1"), not null
-#  base_factor           :bigint           default("1"), not null
-#  precision             :integer          default("8"), not null
+#  deposit_fee           :decimal(32, 16)  default(0.0), not null
+#  min_deposit_amount    :decimal(32, 16)  default(0.0), not null
+#  min_collection_amount :decimal(32, 16)  default(0.0), not null
+#  withdraw_fee          :decimal(32, 16)  default(0.0), not null
+#  min_withdraw_amount   :decimal(32, 16)  default(0.0), not null
+#  withdraw_limit_24h    :decimal(32, 16)  default(0.0), not null
+#  withdraw_limit_72h    :decimal(32, 16)  default(0.0), not null
+#  position              :integer          default(0), not null
+#  options               :string(1000)     default({})
+#  visible               :boolean          default(TRUE), not null
+#  deposit_enabled       :boolean          default(TRUE), not null
+#  withdrawal_enabled    :boolean          default(TRUE), not null
+#  base_factor           :bigint           default(1), not null
+#  precision             :integer          default(8), not null
 #  icon_url              :string(255)
+#  price                 :decimal(32, 16)
 #  created_at            :datetime         not null
 #  updated_at            :datetime         not null
 #
 # Indexes
 #
-#  index_currencies_on_position  (position)
-#  index_currencies_on_visible   (visible)
+#  index_currencies_on_parent_id  (parent_id)
+#  index_currencies_on_position   (position)
+#  index_currencies_on_visible    (visible)
 #

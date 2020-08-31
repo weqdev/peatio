@@ -65,7 +65,7 @@ module API
             desc: 'Currency transaction exprorer url template',
             example: 'https://testnet.blockchain.info/tx/'
           },
-          if: -> (currency){ currency.coin? }
+          if: -> (currency){ currency.crypto? }
         )
 
         expose(
@@ -74,7 +74,7 @@ module API
             desc: 'Currency address exprorer url template',
             example: 'https://testnet.blockchain.info/address/'
           },
-          if: -> (currency){ currency.coin? }
+          if: -> (currency){ currency.crypto? }
         )
 
         expose(
@@ -186,7 +186,7 @@ module API
 
         expose(
           :min_confirmations,
-          if: ->(currency) { currency.coin? },
+          if: ->(currency) { currency.crypto? },
           documentation: {
             desc: 'Number of confirmations required for confirming deposit or withdrawal'
           }

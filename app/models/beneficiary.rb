@@ -70,15 +70,15 @@ class Beneficiary < ApplicationRecord
 
   validates :data, presence: true
 
-  # Validates that data contains address field which is required for coin.
-  validate if: ->(b) { b.currency.present? && b.currency.coin? } do
+  # Validates that data contains address field which is required for coin and token.
+  validate if: ->(b) { b.currency.present? && b.currency.crypto? } do
     errors.add(:data, 'address can\'t be blank') if data.blank? || data['address'].blank?
   end
 
-    # Validates address field which is required for coin.
-    validate if: ->(b) { b.currency.present? && b.currency.coin? } do
-      errors.add(:data, 'invlalid address') if data.present? && data['address'].present? && data['address'].match?(INVALID_ADDRESS_SYMBOLS)
-    end
+  # Validates address field which is required for coin and token.
+  validate if: ->(b) { b.currency.present? && b.currency.crypto? } do
+    errors.add(:data, 'invlalid address') if data.present? && data['address'].present? && data['address'].match?(INVALID_ADDRESS_SYMBOLS)
+  end
 
   # Validates that data contains full_name field which is required for fiat.
   validate if: ->(b) { b.currency.present? && b.currency.fiat? } do
@@ -152,7 +152,7 @@ class Beneficiary < ApplicationRecord
   end
 
   def rid
-    currency.coin? ? coin_rid : fiat_rid
+    currency.crypto? ? coin_rid : fiat_rid
   end
 
   def regenerate_pin!
@@ -162,7 +162,7 @@ class Beneficiary < ApplicationRecord
   private
 
   def coin_rid
-    return unless currency.coin?
+    return unless currency.crypto?
     data['address']
   end
 

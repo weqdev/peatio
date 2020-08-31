@@ -17,7 +17,7 @@ class Operation < ApplicationRecord
   end
 
   validate do
-    unless account&.currency_type == currency&.type
+    unless account&.currency_type == currency&.account_type
       errors.add(:currency, 'type and account currency type don\'t match')
     end
   end
@@ -46,7 +46,7 @@ class Operation < ApplicationRecord
       opt[:code] ||= Operations::Account.find_by(
         type:          operation_type,
         kind:          kind,
-        currency_type: currency.type
+        currency_type: currency.account_type
       ).code
 
       opt.merge(credit: amount, currency_id: currency.id)
@@ -60,7 +60,7 @@ class Operation < ApplicationRecord
       opt[:code] ||= Operations::Account.find_by(
         type:          operation_type,
         kind:          kind,
-        currency_type: currency.type
+        currency_type: currency.account_type
       ).code
 
       opt.merge(debit: amount, currency_id: currency.id)

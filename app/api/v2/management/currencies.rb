@@ -13,12 +13,12 @@ module API
         params do
           optional :type,
                    type: String,
-                   values: { value: %w[fiat coin], message: 'management.currency.invalid_type' },
+                   values: { value: ::Currency.types.map(&:to_s), message: 'management.currency.invalid_type' },
                    desc: -> { API::V2::Entities::Currency.documentation[:type][:desc] }
         end
         post '/currencies/list' do
           currencies = Currency.all
-          currencies = currencies.where(type: params[:type]).includes(:blockchain) if params[:type] == 'coin'
+          currencies = currencies.where(type: Currency::CRYPTO_TYPES).includes(:blockchain) if params[:type].in? Currency::CRYPTO_TYPES.map(&:to_s)
           currencies = currencies.where(type: params[:type]) if params[:type] == 'fiat'
           present currencies.ordered, with: API::V2::Entities::Currency
 
